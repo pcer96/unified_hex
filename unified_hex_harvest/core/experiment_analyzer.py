@@ -11,7 +11,7 @@ from bsp_data_analysis.helpers.standard_imports import *
 
 from .config import ExperimentConfig
 from .metrics import MetricDefinitions
-from .utils.data_queries import DataQueries
+from ..utils.data_queries import DataQueries
 
 
 class ExperimentAnalyzer:
