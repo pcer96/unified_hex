@@ -16,7 +16,7 @@ git init
 git add .
 git commit -m "Initial commit: Centralized experiment analysis library"
 git branch -M main
-git remote add origin https://github.com/your-org/unified_hex_harvest.git
+git remote add origin https://github.com/pcer96/unified_hex.git
 git push -u origin main
 ```
 
@@ -26,7 +26,7 @@ git push -u origin main
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-org/unified_hex_harvest.git
+   git clone https://github.com/pcer96/unified_hex.git
    cd unified_hex_harvest
    ```
 
@@ -97,7 +97,7 @@ git push -u origin main
 #### Option 1: Direct Git Install (Recommended)
 ```python
 # In your Hex notebook
-! pip install git+https://github.com/your-org/unified_hex_harvest.git
+! pip install git+https://github.com/pcer96/unified_hex.git
 ```
 
 #### Option 2: Local Development
