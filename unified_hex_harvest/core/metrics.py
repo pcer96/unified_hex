@@ -4,9 +4,9 @@ Metric definitions for experiment analysis.
 
 from collections import namedtuple
 from typing import List, Dict, Any
-# Import bsp_data_analysis helpers (same as original notebook)
-from bsp_data_analysis.helpers import *
-from bsp_data_analysis.helpers.standard_imports import *
+# Note: bsp_data_analysis imports should be done in Hex notebook
+# from bsp_data_analysis.helpers import *
+# from bsp_data_analysis.helpers.standard_imports import *
 from ..utils.data_queries import DataQueries
 
 Metric = namedtuple('Metric', ['name', 'metric'])

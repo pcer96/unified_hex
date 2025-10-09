@@ -3,7 +3,9 @@ Data query functions for experiment analysis.
 """
 
 from typing import Optional, List, Union
-from bsp_query_builder.dialects.big_query.common import Query
+# Note: Query and other bsp_data_analysis imports should be done in Hex notebook
+# from bsp_data_analysis.helpers import *
+# from bsp_data_analysis.helpers.standard_imports import *
 
 
 class DataQueries:
