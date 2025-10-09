@@ -2,7 +2,7 @@
 Data query functions for experiment analysis.
 """
 
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Any
 # Note: Query and other bsp_data_analysis imports should be done in Hex notebook
 # from bsp_data_analysis.helpers import *
 # from bsp_data_analysis.helpers.standard_imports import *
@@ -18,7 +18,7 @@ class DataQueries:
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         exclude_converted: Optional[bool] = None
-    ) -> Query:
+    ) -> Any:
         """
         Get user base for an experiment with optional filtering.
         
