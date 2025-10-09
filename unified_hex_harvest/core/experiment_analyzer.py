@@ -5,11 +5,9 @@ Main experiment analyzer class.
 import pandas as pd
 import plotly.express as px
 from typing import List, Optional, Dict, Any
-from bsp_data_analysis.helpers import (
-    App, StartDate, EndDate, ActionsEndDate, GranularityInDays,
-    UserBaseBigQuery, OnTableExistence, Label,
-    request_multiple_metrics, plot_profiles
-)
+# Import bsp_data_analysis helpers (same as original notebook)
+from bsp_data_analysis.helpers import *
+from bsp_data_analysis.helpers.standard_imports import *
 
 from .config import ExperimentConfig
 from .metrics import MetricDefinitions
