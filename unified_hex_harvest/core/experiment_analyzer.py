@@ -222,18 +222,18 @@ class ExperimentAnalyzer:
         segmentation_by_client = (
             segmented_users
             .select(
-                ('TIMESTAMP_TRUNC(origin_timestamp, HOUR)', 'time'),
+                ('TIMESTAMP_TRUNC(seg.origin_timestamp, HOUR)', 'time'),
                 ('''
                     CASE 
-                        WHEN segmentation_client = "harvest_ios" THEN "ios"
-                        WHEN segmentation_client = "harvest_android" THEN "android"
-                        WHEN segmentation_client = "harvest_web" THEN "web"
-                        WHEN segmentation_client IN ("harvest_mac_store", "harvest_windows_store") THEN "desktop"
+                        WHEN seg.segmentation_client = "harvest_ios" THEN "ios"
+                        WHEN seg.segmentation_client = "harvest_android" THEN "android"
+                        WHEN seg.segmentation_client = "harvest_web" THEN "web"
+                        WHEN seg.segmentation_client IN ("harvest_mac_store", "harvest_windows_store") THEN "desktop"
                     END
                     ''',
                     'segmentation_client'
                 ),
-                ('COUNT(DISTINCT uid)', 'users'),
+                ('COUNT(DISTINCT seg.uid)', 'users'),
             )
             .group_by('1,2')
         )
