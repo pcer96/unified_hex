@@ -210,11 +210,11 @@ class ExperimentAnalyzer:
                                    exclude_converted=exclude_converted)
     
     def get_segmentation_breakdowns(self):
-        """Get segmentation breakdowns."""
-        # Build the query exactly like the original notebook
+        """Get segmentation breakdowns - copied exactly from original notebook."""
+        # Get Query class
         Query = self.data_queries._get_query()
         
-        # Build segmented_users subquery
+        # Build segmented_users exactly like original notebook
         segmented_users = (
             Query()
             .select(
@@ -233,40 +233,42 @@ class ExperimentAnalyzer:
         if self.config.end_date:
             segmented_users.where(f'DATE(event_timestamp) <= "{self.config.end_date}"')
 
-        # Build userbase with seg alias
+        # Build userbase exactly like original notebook
         userbase = (
             Query()
             .select(" seg.uid,seg.origin_timestamp,seg.segmentation_client,seg.segment_name")
             .from_(segmented_users, alias='seg')
         )
-        
-        # Segmentation by client - use userbase (which has seg alias)
+
+        # Copy exact segmentation_by_client from original notebook
         segmentation_by_client = (
-            userbase
+            Query()
             .select(
-                ('TIMESTAMP_TRUNC(seg.origin_timestamp, HOUR)', 'time'),
+                ('TIMESTAMP_TRUNC(origin_timestamp, HOUR)', 'time'),
                 ('''
                     CASE 
-                        WHEN seg.segmentation_client = "harvest_ios" THEN "ios"
-                        WHEN seg.segmentation_client = "harvest_android" THEN "android"
-                        WHEN seg.segmentation_client = "harvest_web" THEN "web"
-                        WHEN seg.segmentation_client IN ("harvest_mac_store", "harvest_windows_store") THEN "desktop"
+                        WHEN segmentation_client = "harvest_ios" THEN "ios"
+                        WHEN segmentation_client = "harvest_android" THEN "android"
+                        WHEN segmentation_client = "harvest_web" THEN "web"
+                        WHEN segmentation_client IN ("harvest_mac_store", "harvest_windows_store") THEN "desktop"
                     END
                     ''',
                     'segmentation_client'
                 ),
-                ('COUNT(DISTINCT seg.uid)', 'users'),
+                ('COUNT(DISTINCT uid)', 'users'),
             )
+            .from_(segmented_users)
             .group_by('1,2')
         )
-        
-        # Segmentation by segment - use userbase (which has seg alias)
+
+        # Copy exact segmentation_by_segment from original notebook
         segmentation_by_segment = (
-            userbase
+            Query()
             .select(
-                'seg.segment_name',
-                ('COUNT(DISTINCT seg.uid)', 'users'),
+                'segment_name',
+                ('COUNT(DISTINCT uid)', 'users'),
             )
+            .from_(segmented_users)
             .group_by('1')
         )
         
