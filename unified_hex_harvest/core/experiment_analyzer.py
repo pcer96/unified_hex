@@ -279,10 +279,8 @@ class ExperimentAnalyzer:
         segmentation_by_client, segmentation_by_segment = self.get_segmentation_breakdowns()
         
         # Plot by client
-        print("DEBUG: SQL Query:")
-        print(segmentation_by_client.to_sql())
-        print("=" * 50)
-        df_seg_client = pd.read_gbq(segmentation_by_client.to_sql())
+        import pandas_gbq
+        df_seg_client = pandas_gbq.read_gbq(segmentation_by_client.to_sql())
         df = df_seg_client.copy().sort_values('time')
         df['users_cumulative'] = df.groupby('segmentation_client')['users'].transform('cumsum')
         
@@ -291,13 +289,17 @@ class ExperimentAnalyzer:
             x='time',
             y='users_cumulative',
             color='segmentation_client',
-            title='<b>Segmented Users - Breakdown by Client</b>',
-            category_orders={'segmentation_client': ['ios', 'android', 'desktop', 'web']}
+            title='<b>Segmented Users - Breakdown by Client</b>'
+        )
+        fig.update_layout(
+            xaxis_title="Time",
+            yaxis_title="Cumulative Users",
+            legend_title="Client"
         )
         fig.show()
         
         # Plot by segment
-        df_seg_segment = pd.read_gbq(segmentation_by_segment.to_sql())
+        df_seg_segment = pandas_gbq.read_gbq(segmentation_by_segment.to_sql())
         df = df_seg_segment.copy()
         
         fig = px.bar(
@@ -305,7 +307,12 @@ class ExperimentAnalyzer:
             x='segment_name',
             y='users',
             color='segment_name',
-            title='<b>Segmented Users - Breakdown by Segment</b>',
+            title='<b>Segmented Users - Breakdown by Segment</b>'
+        )
+        fig.update_layout(
+            xaxis_title="Segment",
+            yaxis_title="Users",
+            legend_title="Segment"
         )
         fig.show()
     
@@ -375,7 +382,8 @@ class ExperimentAnalyzer:
         FROM conversions
         """
         
-        return pd.read_gbq(conversion_breakdown_query)
+        import pandas_gbq
+        return pandas_gbq.read_gbq(conversion_breakdown_query)
     
     def run_full_analysis(self, metrics_to_analyze: Optional[List[str]] = None):
         """
