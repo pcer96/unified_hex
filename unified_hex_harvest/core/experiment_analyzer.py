@@ -211,8 +211,8 @@ class ExperimentAnalyzer:
     
     def get_segmentation_breakdowns(self):
         """Get segmentation breakdowns."""
-        # Get segmented users query
-        segmented_users = self.data_queries.get_experiment_user_base(
+        # Get segmented users subquery (not the final userbase)
+        segmented_users = self.data_queries.get_segmented_users_subquery(
             experiment_name=self.config.experiment_name,
             start_date=self.config.start_date,
             end_date=self.config.end_date

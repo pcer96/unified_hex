@@ -115,6 +115,52 @@ class DataQueries:
         return userbase
 
     @staticmethod
+    def get_segmented_users_subquery(
+        experiment_name: str,
+        segment_name: Optional[Union[str, List[str]]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None
+    ) -> Any:
+        """
+        Get the segmented users subquery (without the final userbase wrapper).
+        
+        Args:
+            experiment_name: Name of the experiment
+            segment_name: Segment name(s) to filter by
+            start_date: Start date filter
+            end_date: End date filter
+            
+        Returns:
+            Query object for the segmented users subquery
+        """
+        Query = DataQueries._get_query()
+        
+        segmented_users = (
+            Query()
+            .select(
+                ("JSON_EXTRACT_SCALAR(identifiers, '$.harvest_account_id')", "uid"),
+                ('MIN(event_timestamp)', 'origin_timestamp'),
+                ("MIN_BY( JSON_VALUE(payload, '$.bsp_id'), event_timestamp)", "segmentation_client"),
+                ("MIN_BY(JSON_VALUE(payload, '$.segment_name'), event_timestamp)", "segment_name")
+            )
+            .from_('`harvest-picox-42.harvest_orion.service_improvement`')
+            .where(f"JSON_VALUE(payload, '$.experiment_name') = '{experiment_name}' ")
+            .group_by('1')
+        )
+
+        if segment_name:
+            if isinstance(segment_name, str):
+                segment_name = [segment_name]
+            segments_in_list = '("' + '", "'.join(segment_name) + '")'
+            segmented_users.where(f"JSON_VALUE(payload, '$.segment_name') IN {segments_in_list}")
+        if start_date:
+            segmented_users.where(f'DATE(event_timestamp) >= "{start_date}"')
+        if end_date:
+            segmented_users.where(f'DATE(event_timestamp) <= "{end_date}"')
+
+        return segmented_users
+
+    @staticmethod
     def get_time_entries(start_date: str, end_date: str) -> str:
         """Get time entries query."""
         return f'''
