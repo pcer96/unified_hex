@@ -57,12 +57,12 @@ class MetricDefinitions:
             )]
         )
     
-    def get_subscription_arps(self) -> Metric:
+    def get_subscription_arps(self, Query) -> Metric:
         """Get subscription ARPS metric."""
         return Metric(
             name='ARPS',
             metric=[CustomValuedMetric(
-                target_query=self._data_queries.get_conversions(self.start_date, self.end_date, only_paid=True), 
+                target_query=self._data_queries.get_conversions(Query, self.start_date, self.end_date, only_paid=True), 
                 estimator='cumulated'
             )]
         )

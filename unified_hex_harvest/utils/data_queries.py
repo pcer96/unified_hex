@@ -3,9 +3,8 @@ Data query functions for experiment analysis.
 """
 
 from typing import Optional, List, Union, Any
-# Note: Query and other bsp_data_analysis imports should be done in Hex notebook
-# from bsp_data_analysis.helpers import *
-# from bsp_data_analysis.helpers.standard_imports import *
+# Import Query directly in the package
+from bsp_query_builder.dialects.big_query.common import Query
 
 
 class DataQueries:
@@ -32,8 +31,6 @@ class DataQueries:
         Returns:
             Query object for the user base
         """
-        # Note: Query comes from bsp_query_builder.dialects.big_query.common
-        # which should be imported in the Hex notebook
         segmented_users = (
             Query()
             .select(
