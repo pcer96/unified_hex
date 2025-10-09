@@ -3,12 +3,30 @@ Data query functions for experiment analysis.
 """
 
 from typing import Optional, List, Union, Any
-# Import Query directly - available in Hex environment
-from bsp_query_builder.dialects.big_query.common import Query
+
+# Query will be available in Hex environment through global imports
+# We'll access it dynamically when needed
 
 
 class DataQueries:
     """Collection of data query functions for experiment analysis."""
+    
+    @staticmethod
+    def _get_query():
+        """Get Query class from global namespace (Hex environment)."""
+        import sys
+        frame = sys._getframe(2)  # Go up 2 levels to get to the caller
+        while frame:
+            if 'Query' in frame.f_globals:
+                return frame.f_globals['Query']
+            frame = frame.f_back
+        
+        raise NameError(
+            "Query not found in global namespace. Make sure to import it in your Hex notebook with:\n"
+            "from bsp_data_analysis.helpers.standard_imports import *\n"
+            "or\n"
+            "from bsp_query_builder.dialects.big_query.common import Query"
+        )
     
     @staticmethod
     def get_experiment_user_base(
@@ -31,6 +49,7 @@ class DataQueries:
         Returns:
             Query object for the user base
         """
+        Query = DataQueries._get_query()
         segmented_users = (
             Query()
             .select(
@@ -572,6 +591,7 @@ class DataQueries:
     @staticmethod
     def get_conversions(start_date: str, end_date: str, only_paid: bool = False) -> Any:
         """Get conversions query."""
+        Query = DataQueries._get_query()
         transactions = (
             Query()
             .select(
@@ -610,6 +630,7 @@ class DataQueries:
     @staticmethod
     def get_aro(start_date: str, end_date: str) -> Any:
         """Get auto-renew off query."""
+        Query = DataQueries._get_query()
         aro = (
             Query()
             .select('user_id uid, timestamp as event_timestamp')
