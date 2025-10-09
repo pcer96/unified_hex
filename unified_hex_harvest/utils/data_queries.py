@@ -571,7 +571,7 @@ class DataQueries:
       OR projects_engaged>0'''
 
     @staticmethod
-    def get_conversions(start_date: str, end_date: str, only_paid: bool = False) -> Query:
+    def get_conversions(start_date: str, end_date: str, only_paid: bool = False) -> Any:
         """Get conversions query."""
         transactions = (
             Query()
@@ -609,7 +609,7 @@ class DataQueries:
         return final
 
     @staticmethod
-    def get_aro(start_date: str, end_date: str) -> Query:
+    def get_aro(start_date: str, end_date: str) -> Any:
         """Get auto-renew off query."""
         aro = (
             Query()
