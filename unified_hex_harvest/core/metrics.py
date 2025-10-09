@@ -26,9 +26,21 @@ class MetricDefinitions:
         self.end_date = end_date
         self._data_queries = DataQueries()
     
+    def _get_bsp_class(self, class_name: str):
+        """Get bsp_data_analysis class from global namespace."""
+        import sys
+        frame = sys._getframe(2)  # Go up 2 levels to get to the caller
+        while frame:
+            if class_name in frame.f_globals:
+                return frame.f_globals[class_name]
+            frame = frame.f_back
+        else:
+            raise NameError(f"{class_name} not found in global namespace. Make sure to import it in your Hex notebook with: from bsp_data_analysis.helpers import *")
+    
     def get_conversion_to_subscription(self) -> Metric:
         """Get conversion to subscription metric."""
-        # Note: CustomFirstSuccessRateMetric comes from bsp_data_analysis.helpers
+        CustomFirstSuccessRateMetric = self._get_bsp_class('CustomFirstSuccessRateMetric')
+        
         return Metric(
             name='C2S',
             metric=[CustomFirstSuccessRateMetric(
@@ -39,6 +51,8 @@ class MetricDefinitions:
     
     def get_conversion_to_pay_subscription(self) -> Metric:
         """Get conversion to paid subscription metric."""
+        CustomFirstSuccessRateMetric = self._get_bsp_class('CustomFirstSuccessRateMetric')
+        
         return Metric(
             name='C2P',
             metric=[CustomFirstSuccessRateMetric(
@@ -49,6 +63,8 @@ class MetricDefinitions:
     
     def get_subscription_arpu(self) -> Metric:
         """Get subscription ARPU metric."""
+        CustomValuedMetric = self._get_bsp_class('CustomValuedMetric')
+        
         return Metric(
             name='ARPU',
             metric=[CustomValuedMetric(
@@ -57,18 +73,22 @@ class MetricDefinitions:
             )]
         )
     
-    def get_subscription_arps(self, Query) -> Metric:
+    def get_subscription_arps(self) -> Metric:
         """Get subscription ARPS metric."""
+        CustomValuedMetric = self._get_bsp_class('CustomValuedMetric')
+        
         return Metric(
             name='ARPS',
             metric=[CustomValuedMetric(
-                target_query=self._data_queries.get_conversions(Query, self.start_date, self.end_date, only_paid=True), 
+                target_query=self._data_queries.get_conversions(self.start_date, self.end_date, only_paid=True), 
                 estimator='cumulated'
             )]
         )
     
     def get_auto_renew_off(self) -> Metric:
         """Get auto-renew off metric."""
+        CustomFirstSuccessRateMetric = self._get_bsp_class('CustomFirstSuccessRateMetric')
+        
         return Metric(
             name='AutoRenewOff',
             metric=[CustomFirstSuccessRateMetric(
@@ -79,6 +99,8 @@ class MetricDefinitions:
     
     def get_qualified_activity_daily(self) -> Metric:
         """Get qualified activity daily metric."""
+        CustomCountMetric = self._get_bsp_class('CustomCountMetric')
+        
         return Metric(
             name='QualifiedActivityDaily',
             metric=[CustomCountMetric(
@@ -90,6 +112,8 @@ class MetricDefinitions:
     
     def get_sessions(self) -> Metric:
         """Get sessions metric."""
+        CustomCountMetric = self._get_bsp_class('CustomCountMetric')
+        
         return Metric(
             name='Sessions',
             metric=[CustomCountMetric(
@@ -101,6 +125,8 @@ class MetricDefinitions:
     
     def get_tracked_hours(self) -> Metric:
         """Get tracked hours metric."""
+        CustomValuedMetric = self._get_bsp_class('CustomValuedMetric')
+        
         return Metric(
             name='HoursTracked',
             metric=[CustomValuedMetric(
@@ -113,6 +139,8 @@ class MetricDefinitions:
     def get_retention(self) -> Metric:
         """Get retention metric (placeholder - implement based on your retention logic)."""
         # This is a placeholder - you'll need to implement your retention logic
+        CustomCountMetric = self._get_bsp_class('CustomCountMetric')
+        
         return Metric(
             name='Retention',
             metric=[CustomCountMetric(
