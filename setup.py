@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="harvest-experiment-analysis",
+    name="unified-hex-harvest",
     version="1.0.0",
     description="Centralized experiment analysis library for Harvest Hex notebooks",
     author="Your Team",
