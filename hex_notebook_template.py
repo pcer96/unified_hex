@@ -17,7 +17,7 @@ Just modify the experiment parameters below and run the analysis!
 ! uv pip install git+https://github.com/pcer96/unified_hex.git
 
 # Import the centralized library
-from unified_hex_harvest import ExperimentAnalyzer, ExperimentConfig, create_experiment_config, setup_credentials
+from unified_hex_harvest import ExperimentAnalyzer, ExperimentConfig, create_experiment_config
 
 # Standard imports (these should already be available in your Hex environment)
 import os
