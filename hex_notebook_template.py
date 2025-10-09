@@ -23,7 +23,7 @@ from unified_hex_harvest import ExperimentAnalyzer, ExperimentConfig, create_exp
 import os
 from bsp_data_analysis.helpers import *
 from bsp_data_analysis.helpers.standard_imports import *
-from bsp_query_builder.dialects.big_query.common import (Case, case_cond)
+from bsp_query_builder.dialects.big_query.common import (Case, case_cond, Query)
 from IPython.display import Markdown, display
 from datetime import datetime
 

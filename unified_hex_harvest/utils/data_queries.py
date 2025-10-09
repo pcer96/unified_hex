@@ -32,6 +32,8 @@ class DataQueries:
         Returns:
             Query object for the user base
         """
+        # Note: Query comes from bsp_query_builder.dialects.big_query.common
+        # which should be imported in the Hex notebook
         segmented_users = (
             Query()
             .select(
