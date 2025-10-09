@@ -28,6 +28,7 @@ class MetricDefinitions:
     
     def get_conversion_to_subscription(self) -> Metric:
         """Get conversion to subscription metric."""
+        # Note: CustomFirstSuccessRateMetric comes from bsp_data_analysis.helpers
         return Metric(
             name='C2S',
             metric=[CustomFirstSuccessRateMetric(
@@ -135,21 +136,21 @@ class MetricDefinitions:
             ValueError: If metric name is not recognized
         """
         metric_map = {
-            'ConversionToSubscription': self.get_conversion_to_subscription(),
-            'ConversionToPaySubscription': self.get_conversion_to_pay_subscription(),
-            'SubscriptionArpu': self.get_subscription_arpu(),
-            'SubscriptionArps': self.get_subscription_arps(),
-            'Retention': self.get_retention(),
-            'AutoRenewOff': self.get_auto_renew_off(),
-            'QualifiedActivityDaily': self.get_qualified_activity_daily(),
-            'Sessions': self.get_sessions(),
-            'HoursTracked': self.get_tracked_hours(),
+            'ConversionToSubscription': self.get_conversion_to_subscription,
+            'ConversionToPaySubscription': self.get_conversion_to_pay_subscription,
+            'SubscriptionArpu': self.get_subscription_arpu,
+            'SubscriptionArps': self.get_subscription_arps,
+            'Retention': self.get_retention,
+            'AutoRenewOff': self.get_auto_renew_off,
+            'QualifiedActivityDaily': self.get_qualified_activity_daily,
+            'Sessions': self.get_sessions,
+            'HoursTracked': self.get_tracked_hours,
         }
         
         if metric_name not in metric_map:
             raise ValueError(f"Unknown metric: {metric_name}. Available metrics: {list(metric_map.keys())}")
         
-        return metric_map[metric_name]
+        return metric_map[metric_name]()
     
     def get_metrics_list(self, metric_names: List[str]) -> List[Metric]:
         """
