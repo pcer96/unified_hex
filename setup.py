@@ -8,7 +8,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "pandas",
-        "plotly==5.17.0",
+        "plotly>=5.24.1",
         "pandas-gbq",
         "scipy",
         "slack-sdk",

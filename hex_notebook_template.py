@@ -13,9 +13,8 @@ Just modify the experiment parameters below and run the analysis!
 # ! uv pip install -q bsp-data-analysis -i https://{ARTIFACTORY_USERNAME}:{ARTIFACTORY_ACCESS_TOKEN}@{ARTIFACTORY_URL}/api/pypi/pypi/simple
 # ! uv pip install -q bsp-query-builder -i https://{ARTIFACTORY_USERNAME}:{ARTIFACTORY_ACCESS_TOKEN}@{ARTIFACTORY_URL}/api/pypi/pypi/simple
 
-# Install plotly with specific version to avoid compatibility issues with bsp_data_analysis
-# Try different versions if this doesn't work
-! uv pip install -q "plotly==5.17.0" pandas-gbq matplotlib
+# Install plotly with version compatible with bsp_data_analysis (from their pyproject.toml)
+! uv pip install -q "plotly>=5.24.1" pandas-gbq matplotlib
 
 # Install the centralized library
 ! uv pip install git+https://github.com/pcer96/unified_hex.git
