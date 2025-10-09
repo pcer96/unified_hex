@@ -31,8 +31,10 @@ from datetime import datetime
 # 🔐 SETUP CREDENTIALS
 # =============================================================================
 
-# Setup credentials from Hex secrets (this handles BigQuery authentication)
-setup_credentials(use_hex_secrets=True)
+# Setup credentials (same as your original notebook)
+with open('credentials.json', 'w') as f:
+    f.write(HARVEST_CREDENTIALS)
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'credentials.json'
 
 # =============================================================================
 # 🔧 EXPERIMENT CONFIGURATION

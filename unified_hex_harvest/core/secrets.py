@@ -17,7 +17,16 @@ class HexSecrets:
         Returns:
             Harvest credentials JSON string
         """
-        # In Hex, this would be: HARVEST_CREDENTIALS
+        # In Hex, secrets are available as global variables
+        # Try to get from globals() first (Hex secrets), then from environment
+        import sys
+        frame = sys._getframe(1)
+        while frame:
+            if 'HARVEST_CREDENTIALS' in frame.f_globals:
+                return frame.f_globals['HARVEST_CREDENTIALS']
+            frame = frame.f_back
+        
+        # Fallback to environment variable
         return os.environ.get('HARVEST_CREDENTIALS', '')
     
     @staticmethod
