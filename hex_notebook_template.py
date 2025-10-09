@@ -9,8 +9,9 @@ Just modify the experiment parameters below and run the analysis!
 # 📦 INSTALLATION & IMPORTS
 # =============================================================================
 
-# Install bsp-data-analysis first (if not already installed)
+# Install required packages first (if not already installed)
 # ! uv pip install -q bsp-data-analysis -i https://{ARTIFACTORY_USERNAME}:{ARTIFACTORY_ACCESS_TOKEN}@{ARTIFACTORY_URL}/api/pypi/pypi/simple
+# ! uv pip install -q bsp-query-builder -i https://{ARTIFACTORY_USERNAME}:{ARTIFACTORY_ACCESS_TOKEN}@{ARTIFACTORY_URL}/api/pypi/pypi/simple
 
 # Install the centralized library
 ! uv pip install git+https://github.com/pcer96/unified_hex.git
