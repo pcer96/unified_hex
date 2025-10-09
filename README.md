@@ -9,11 +9,14 @@ A centralized Python library for experiment analysis in Hex notebooks. This libr
 
 ## 🚀 Quick Start
 
-### 1. Install the Library
+### 1. Install Dependencies
 
-```bash
-# In your Hex notebook or terminal
-! pip install -e /path/to/unified_hex_harvest
+```python
+# In your Hex notebook - install bsp-data-analysis first
+! uv pip install -q bsp-data-analysis -i https://{ARTIFACTORY_USERNAME}:{ARTIFACTORY_ACCESS_TOKEN}@{ARTIFACTORY_URL}/api/pypi/pypi/simple
+
+# Then install the centralized library
+! uv pip install git+https://github.com/pcer96/unified_hex.git
 ```
 
 ### 2. Setup Secrets

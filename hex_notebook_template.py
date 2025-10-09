@@ -9,8 +9,11 @@ Just modify the experiment parameters below and run the analysis!
 # 📦 INSTALLATION & IMPORTS
 # =============================================================================
 
-# Install the centralized library (run this once)
-# ! pip install -e /path/to/unified_hex_harvest
+# Install bsp-data-analysis first (if not already installed)
+# ! uv pip install -q bsp-data-analysis -i https://{ARTIFACTORY_USERNAME}:{ARTIFACTORY_ACCESS_TOKEN}@{ARTIFACTORY_URL}/api/pypi/pypi/simple
+
+# Install the centralized library
+! uv pip install git+https://github.com/pcer96/unified_hex.git
 
 # Import the centralized library
 from unified_hex_harvest import ExperimentAnalyzer, ExperimentConfig, create_experiment_config, setup_credentials
