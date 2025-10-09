@@ -284,48 +284,48 @@ class ExperimentAnalyzer:
         df = df_seg_client.copy().sort_values('time')
         df['users_cumulative'] = df.groupby('segmentation_client')['users'].transform('cumsum')
         
-        import plotly.graph_objects as go
+        import matplotlib.pyplot as plt
         
-        fig = go.Figure()
+        plt.figure(figsize=(12, 6))
         
         for client in df['segmentation_client'].unique():
             client_data = df[df['segmentation_client'] == client]
-            fig.add_trace(go.Scatter(
-                x=client_data['time'],
-                y=client_data['users_cumulative'],
-                mode='lines+markers',
-                name=client,
-                line=dict(width=2)
-            ))
+            plt.plot(client_data['time'], client_data['users_cumulative'], 
+                    marker='o', linewidth=2, label=client)
         
-        fig.update_layout(
-            title='<b>Segmented Users - Breakdown by Client</b>',
-            xaxis_title="Time",
-            yaxis_title="Cumulative Users",
-            legend_title="Client",
-            height=500
-        )
-        fig.show()
+        plt.title('Segmented Users - Breakdown by Client', fontsize=14, fontweight='bold')
+        plt.xlabel('Time')
+        plt.ylabel('Cumulative Users')
+        plt.legend(title='Client')
+        plt.grid(True, alpha=0.3)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
         
         # Plot by segment
         df_seg_segment = pandas_gbq.read_gbq(segmentation_by_segment.to_sql())
         df = df_seg_segment.copy()
         
-        fig = go.Figure()
+        plt.figure(figsize=(10, 6))
         
-        fig.add_trace(go.Bar(
-            x=df['segment_name'],
-            y=df['users'],
-            marker_color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
-        ))
+        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         
-        fig.update_layout(
-            title='<b>Segmented Users - Breakdown by Segment</b>',
-            xaxis_title="Segment",
-            yaxis_title="Users",
-            height=500
-        )
-        fig.show()
+        bars = plt.bar(df['segment_name'], df['users'], color=colors[:len(df)])
+        
+        plt.title('Segmented Users - Breakdown by Segment', fontsize=14, fontweight='bold')
+        plt.xlabel('Segment')
+        plt.ylabel('Users')
+        plt.xticks(rotation=45)
+        plt.grid(True, alpha=0.3, axis='y')
+        
+        # Add value labels on bars
+        for bar in bars:
+            height = bar.get_height()
+            plt.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{int(height)}', ha='center', va='bottom')
+        
+        plt.tight_layout()
+        plt.show()
     
     def get_conversion_breakdowns(self):
         """Get conversion breakdowns if enabled."""
