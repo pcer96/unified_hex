@@ -28,17 +28,23 @@ class ExperimentAnalyzer:
         self.data_queries = DataQueries()
         self.metrics = MetricDefinitions(config.start_date, config.end_date)
         
-        # Build common parameters
-        self.common_params = [
-            App("HarvestWeb"),
-            StartDate(config.start_date),
-            EndDate(config.end_date),
-            ActionsEndDate(config.actions_end_date),
-            GranularityInDays(config.granularity_in_days),
-        ]
+        # Build common parameters (will be created when needed)
+        self.common_params = None
         
         # Build segments parameters
         self._build_segments_params()
+    
+    def _build_common_params(self):
+        """Build common parameters when needed."""
+        if self.common_params is None:
+            self.common_params = [
+                App("HarvestWeb"),
+                StartDate(self.config.start_date),
+                EndDate(self.config.end_date),
+                ActionsEndDate(self.config.actions_end_date),
+                GranularityInDays(self.config.granularity_in_days),
+            ]
+        return self.common_params
     
     def _build_segments_params(self):
         """Build segments parameters for the experiment."""
@@ -108,7 +114,7 @@ class ExperimentAnalyzer:
         
         # Request metrics
         results = request_multiple_metrics(
-            common_params=self.common_params + metric.metric,
+            common_params=self._build_common_params() + metric.metric,
             segments_params=segments_params,
         )
         
@@ -167,6 +173,36 @@ class ExperimentAnalyzer:
         for metric_name in self.config.metrics_list:
             print(f"Analyzing {metric_name}...")
             self.request_and_plot_metric(metric_name, exclude_converted=exclude_converted)
+    
+    def analyze_specific_metrics(self, metric_names: List[str], exclude_converted: bool = False):
+        """
+        Analyze specific metrics.
+        
+        Args:
+            metric_names: List of metric names to analyze
+            exclude_converted: Whether to exclude converted users
+        """
+        for metric_name in metric_names:
+            if metric_name in self.config.metrics_list:
+                print(f"Analyzing {metric_name}...")
+                self.request_and_plot_metric(metric_name, exclude_converted=exclude_converted)
+            else:
+                print(f"⚠️  Metric '{metric_name}' not found in available metrics: {self.config.metrics_list}")
+    
+    def analyze_single_metric(self, metric_name: str, title: Optional[str] = None, 
+                            uplift_vs: Optional[str] = None, exclude_converted: bool = False):
+        """
+        Analyze a single metric with custom options.
+        
+        Args:
+            metric_name: Name of the metric to analyze
+            title: Custom title for the plot
+            uplift_vs: Segment to compute uplift against
+            exclude_converted: Whether to exclude converted users
+        """
+        print(f"Analyzing {metric_name}...")
+        self.request_and_plot_metric(metric_name, title=title, uplift_vs=uplift_vs, 
+                                   exclude_converted=exclude_converted)
     
     def get_segmentation_breakdowns(self):
         """Get segmentation breakdowns."""
@@ -309,8 +345,14 @@ class ExperimentAnalyzer:
         
         return pd.read_gbq(conversion_breakdown_query)
     
-    def run_full_analysis(self):
-        """Run the complete experiment analysis."""
+    def run_full_analysis(self, metrics_to_analyze: Optional[List[str]] = None):
+        """
+        Run the complete experiment analysis.
+        
+        Args:
+            metrics_to_analyze: Optional list of specific metrics to analyze. 
+                               If None, analyzes all configured metrics.
+        """
         print(f"Starting analysis for experiment: {self.config.experiment_name}")
         print(f"Date range: {self.config.start_date} to {self.config.end_date}")
         print(f"Segments: {', '.join(self.config.experiment_segments)}")
@@ -321,9 +363,13 @@ class ExperimentAnalyzer:
             print("Plotting segmentation breakdowns...")
             self.plot_segmentation_breakdowns()
         
-        # Analyze all metrics
-        print("Analyzing metrics...")
-        self.analyze_all_metrics()
+        # Analyze metrics
+        if metrics_to_analyze:
+            print(f"Analyzing specific metrics: {', '.join(metrics_to_analyze)}")
+            self.analyze_specific_metrics(metrics_to_analyze)
+        else:
+            print("Analyzing all configured metrics...")
+            self.analyze_all_metrics()
         
         # Get conversion breakdowns
         if self.config.include_conversion_breakdowns:

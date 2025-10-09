@@ -90,7 +90,20 @@ config = create_experiment_config(
 # Initialize the analyzer
 analyzer = ExperimentAnalyzer(config)
 
-# Run the complete analysis
+# Option 1: Run complete analysis with all metrics
+# analyzer.run_full_analysis()
+
+# Option 2: Run analysis with specific metrics only
+# analyzer.run_full_analysis(metrics_to_analyze=['ConversionToSubscription', 'SubscriptionArpu'])
+
+# Option 3: Analyze individual metrics with custom options
+# analyzer.analyze_single_metric('ConversionToSubscription', title='Custom C2S Title')
+# analyzer.analyze_single_metric('ConversionToSubscription', uplift_vs='control_segment')
+
+# Option 4: Analyze multiple specific metrics
+# analyzer.analyze_specific_metrics(['ConversionToSubscription', 'SubscriptionArpu'])
+
+# For now, let's run the complete analysis
 analyzer.run_full_analysis()
 
 # =============================================================================
