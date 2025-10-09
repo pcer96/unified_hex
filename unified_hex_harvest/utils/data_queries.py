@@ -3,7 +3,7 @@ Data query functions for experiment analysis.
 """
 
 from typing import Optional, List, Union, Any
-# Import Query directly in the package
+# Import Query directly - available in Hex environment
 from bsp_query_builder.dialects.big_query.common import Query
 
 
