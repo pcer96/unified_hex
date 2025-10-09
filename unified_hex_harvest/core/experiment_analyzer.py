@@ -284,17 +284,26 @@ class ExperimentAnalyzer:
         df = df_seg_client.copy().sort_values('time')
         df['users_cumulative'] = df.groupby('segmentation_client')['users'].transform('cumsum')
         
-        fig = px.line(
-            df,
-            x='time',
-            y='users_cumulative',
-            color='segmentation_client',
-            title='<b>Segmented Users - Breakdown by Client</b>'
-        )
+        import plotly.graph_objects as go
+        
+        fig = go.Figure()
+        
+        for client in df['segmentation_client'].unique():
+            client_data = df[df['segmentation_client'] == client]
+            fig.add_trace(go.Scatter(
+                x=client_data['time'],
+                y=client_data['users_cumulative'],
+                mode='lines+markers',
+                name=client,
+                line=dict(width=2)
+            ))
+        
         fig.update_layout(
+            title='<b>Segmented Users - Breakdown by Client</b>',
             xaxis_title="Time",
             yaxis_title="Cumulative Users",
-            legend_title="Client"
+            legend_title="Client",
+            height=500
         )
         fig.show()
         
@@ -302,17 +311,19 @@ class ExperimentAnalyzer:
         df_seg_segment = pandas_gbq.read_gbq(segmentation_by_segment.to_sql())
         df = df_seg_segment.copy()
         
-        fig = px.bar(
-            df,
-            x='segment_name',
-            y='users',
-            color='segment_name',
-            title='<b>Segmented Users - Breakdown by Segment</b>'
-        )
+        fig = go.Figure()
+        
+        fig.add_trace(go.Bar(
+            x=df['segment_name'],
+            y=df['users'],
+            marker_color=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        ))
+        
         fig.update_layout(
+            title='<b>Segmented Users - Breakdown by Segment</b>',
             xaxis_title="Segment",
             yaxis_title="Users",
-            legend_title="Segment"
+            height=500
         )
         fig.show()
     
