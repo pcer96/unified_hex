@@ -8,10 +8,12 @@ setup(
     packages=find_packages(),
     install_requires=[
         "pandas",
-        "plotly",
+        "plotly>=5.0.0",
+        "pandas-gbq",
         "scipy",
         "slack-sdk",
         "kaleido",
+        "matplotlib",
         # Add other dependencies from your current notebook
     ],
     python_requires=">=3.8",
