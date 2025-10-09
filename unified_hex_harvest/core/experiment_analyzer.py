@@ -145,17 +145,16 @@ class ExperimentAnalyzer:
         default_title = f"<b>{metric.name}</b><br>StartDate={self.config.start_date} EndDate={self.config.end_date} ActionsEndDate={self.config.actions_end_date}"
         title = default_title if title is None else title
         
-        # Dynamically get request_multiple_metrics, plot_profiles from global namespace
+        # Dynamically get request_multiple_metrics from global namespace
         import sys
         frame = sys._getframe(1) # Go up 1 level to get to the caller
         while frame:
             if 'request_multiple_metrics' in frame.f_globals:
                 request_multiple_metrics = frame.f_globals['request_multiple_metrics']
-                plot_profiles = frame.f_globals['plot_profiles']
                 break
             frame = frame.f_back
         else:
-            raise NameError("Required bsp_data_analysis.helpers functions (request_multiple_metrics, plot_profiles) not found in global namespace. Make sure to import them in your Hex notebook with: from bsp_data_analysis.helpers import *")
+            raise NameError("Required bsp_data_analysis.helpers function (request_multiple_metrics) not found in global namespace. Make sure to import it in your Hex notebook with: from bsp_data_analysis.helpers import *")
         
         # Request metrics
         results = request_multiple_metrics(
@@ -163,19 +162,28 @@ class ExperimentAnalyzer:
             segments_params=segments_params,
         )
         
-        # Create plot
-        fig = plot_profiles(
-            results,
-            title=title,
-            show=False,
-            return_figure=True,
-            height=500,
-        )
+        # Create plot using matplotlib instead of plotly to avoid compatibility issues
+        import matplotlib.pyplot as plt
+        import pandas as pd
         
-        if additional_figure_params:
-            fig.update_layout(**additional_figure_params)
+        plt.figure(figsize=(12, 6))
         
-        fig.update_layout(margin={"t": 80}).show()
+        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        
+        for i, segment in enumerate(self.config.experiment_segments):
+            if i < len(results):
+                result = results[i]
+                df = pd.DataFrame(result.profile)
+                plt.plot(df['time_bin'], df['value'], 
+                        marker='o', linewidth=2, label=segment, color=colors[i % len(colors)])
+        
+        plt.title(title.replace('<b>', '').replace('</b>', '').replace('<br>', '\n'), fontsize=14, fontweight='bold')
+        plt.xlabel('Time')
+        plt.ylabel('Value')
+        plt.legend(title='Segment')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.show()
         
         # Handle uplift calculation
         if uplift_vs:
@@ -183,6 +191,9 @@ class ExperimentAnalyzer:
     
     def _plot_uplift(self, results: List, uplift_vs: str, metric_name: str):
         """Plot uplift against a baseline segment."""
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        
         df = pd.DataFrame(results[self.config.experiment_segments.index(uplift_vs)].profile)
         cols = ['time_bin']
         
@@ -195,23 +206,23 @@ class ExperimentAnalyzer:
                 )
                 cols.append(segment + '_uplift_vs_' + uplift_vs)
         
-        melted_df = df[cols].melt(id_vars=['time_bin'], var_name='series', value_name='values')
+        plt.figure(figsize=(12, 6))
         
-        fig = px.scatter(
-            melted_df, 
-            x='time_bin', 
-            y='values', 
-            color='series',
-            title=f'<b>Uplift vs {uplift_vs}</b>',
-            labels={'time_bin': 'Days', 'values': '', 'series': ''}
-        )
+        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
         
-        fig.update_yaxes(title=None)
-        fig.update_traces(marker=dict(size=10))
-        fig.update_yaxes(showgrid=True, gridcolor='lightgrey')
-        fig.update_layout(plot_bgcolor='white')
-        fig.add_hline(y=0, line_color="black")
-        fig.show()
+        for i, col in enumerate(cols[1:]):  # Skip time_bin column
+            plt.scatter(df['time_bin'], df[col], 
+                       label=col.replace('_uplift_vs_' + uplift_vs, ''), 
+                       color=colors[i % len(colors)], s=50)
+        
+        plt.title(f'Uplift vs {uplift_vs}', fontsize=14, fontweight='bold')
+        plt.xlabel('Days')
+        plt.ylabel('Uplift')
+        plt.legend(title='Segment')
+        plt.grid(True, alpha=0.3)
+        plt.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        plt.tight_layout()
+        plt.show()
     
     def analyze_all_metrics(self, exclude_converted: bool = False):
         """Analyze all configured metrics."""
