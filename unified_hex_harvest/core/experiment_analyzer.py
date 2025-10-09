@@ -255,6 +255,9 @@ class ExperimentAnalyzer:
         segmentation_by_client, segmentation_by_segment = self.get_segmentation_breakdowns()
         
         # Plot by client
+        print("DEBUG: SQL Query:")
+        print(segmentation_by_client.to_sql())
+        print("=" * 50)
         df_seg_client = pd.read_gbq(segmentation_by_client.to_sql())
         df = df_seg_client.copy().sort_values('time')
         df['users_cumulative'] = df.groupby('segmentation_client')['users'].transform('cumsum')
