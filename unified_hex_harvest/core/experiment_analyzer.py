@@ -211,39 +211,61 @@ class ExperimentAnalyzer:
     
     def get_segmentation_breakdowns(self):
         """Get segmentation breakdowns."""
-        # Get segmented users subquery (not the final userbase)
-        segmented_users = self.data_queries.get_segmented_users_subquery(
-            experiment_name=self.config.experiment_name,
-            start_date=self.config.start_date,
-            end_date=self.config.end_date
+        # Build the query exactly like the original notebook
+        Query = self.data_queries._get_query()
+        
+        # Build segmented_users subquery
+        segmented_users = (
+            Query()
+            .select(
+                ("JSON_EXTRACT_SCALAR(identifiers, '$.harvest_account_id')", "uid"),
+                ('MIN(event_timestamp)', 'origin_timestamp'),
+                ("MIN_BY( JSON_VALUE(payload, '$.bsp_id'), event_timestamp)", "segmentation_client"),
+                ("MIN_BY(JSON_VALUE(payload, '$.segment_name'), event_timestamp)", "segment_name")
+            )
+            .from_('`harvest-picox-42.harvest_orion.service_improvement`')
+            .where(f"JSON_VALUE(payload, '$.experiment_name') = '{self.config.experiment_name}' ")
+            .group_by('1')
+        )
+
+        if self.config.start_date:
+            segmented_users.where(f'DATE(event_timestamp) >= "{self.config.start_date}"')
+        if self.config.end_date:
+            segmented_users.where(f'DATE(event_timestamp) <= "{self.config.end_date}"')
+
+        # Build userbase with seg alias
+        userbase = (
+            Query()
+            .select(" seg.uid,seg.origin_timestamp,seg.segmentation_client,seg.segment_name")
+            .from_(segmented_users, alias='seg')
         )
         
-        # Segmentation by client
+        # Segmentation by client - use userbase (which has seg alias)
         segmentation_by_client = (
-            segmented_users
+            userbase
             .select(
-                ('TIMESTAMP_TRUNC(origin_timestamp, HOUR)', 'time'),
+                ('TIMESTAMP_TRUNC(seg.origin_timestamp, HOUR)', 'time'),
                 ('''
                     CASE 
-                        WHEN segmentation_client = "harvest_ios" THEN "ios"
-                        WHEN segmentation_client = "harvest_android" THEN "android"
-                        WHEN segmentation_client = "harvest_web" THEN "web"
-                        WHEN segmentation_client IN ("harvest_mac_store", "harvest_windows_store") THEN "desktop"
+                        WHEN seg.segmentation_client = "harvest_ios" THEN "ios"
+                        WHEN seg.segmentation_client = "harvest_android" THEN "android"
+                        WHEN seg.segmentation_client = "harvest_web" THEN "web"
+                        WHEN seg.segmentation_client IN ("harvest_mac_store", "harvest_windows_store") THEN "desktop"
                     END
                     ''',
                     'segmentation_client'
                 ),
-                ('COUNT(DISTINCT uid)', 'users'),
+                ('COUNT(DISTINCT seg.uid)', 'users'),
             )
             .group_by('1,2')
         )
         
-        # Segmentation by segment
+        # Segmentation by segment - use userbase (which has seg alias)
         segmentation_by_segment = (
-            segmented_users
+            userbase
             .select(
-                'segment_name',
-                ('COUNT(DISTINCT uid)', 'users'),
+                'seg.segment_name',
+                ('COUNT(DISTINCT seg.uid)', 'users'),
             )
             .group_by('1')
         )
