@@ -31,8 +31,9 @@ class ExperimentAnalyzer:
         # Build common parameters (will be created when needed)
         self.common_params = None
         
-        # Build segments parameters
-        self._build_segments_params()
+        # Build segments parameters (will be created when needed)
+        self.segments_params_all = None
+        self.segments_params_noft = None
     
     def _build_common_params(self):
         """Build common parameters when needed."""
@@ -47,43 +48,44 @@ class ExperimentAnalyzer:
         return self.common_params
     
     def _build_segments_params(self):
-        """Build segments parameters for the experiment."""
-        custom_user_base_common_params = {
-            "experiment_name": self.config.experiment_name,
-            "start_date": self.config.start_date,
-            "end_date": self.config.end_date
-        }
-        
-        # Segments with all users
-        self.segments_params_all = [
-            [
-                UserBaseBigQuery(
-                    self.data_queries.get_experiment_user_base(
-                        **custom_user_base_common_params,
-                        segment_name=segment
-                    ).to_sql(),
-                    OnTableExistence.KEEP,
-                ),
-                Label(segment)
+        """Build segments parameters when needed."""
+        if self.segments_params_all is None or self.segments_params_noft is None:
+            custom_user_base_common_params = {
+                "experiment_name": self.config.experiment_name,
+                "start_date": self.config.start_date,
+                "end_date": self.config.end_date
+            }
+            
+            # Segments with all users
+            self.segments_params_all = [
+                [
+                    UserBaseBigQuery(
+                        self.data_queries.get_experiment_user_base(
+                            **custom_user_base_common_params,
+                            segment_name=segment
+                        ).to_sql(),
+                        OnTableExistence.KEEP,
+                    ),
+                    Label(segment)
+                ]
+                for segment in self.config.experiment_segments
             ]
-            for segment in self.config.experiment_segments
-        ]
-        
-        # Segments excluding converted users
-        self.segments_params_noft = [
-            [
-                UserBaseBigQuery(
-                    self.data_queries.get_experiment_user_base(
-                        **custom_user_base_common_params,
-                        segment_name=segment,
-                        exclude_converted=True
-                    ).to_sql(),
-                    OnTableExistence.KEEP,
-                ),
-                Label(segment)
+            
+            # Segments excluding converted users
+            self.segments_params_noft = [
+                [
+                    UserBaseBigQuery(
+                        self.data_queries.get_experiment_user_base(
+                            **custom_user_base_common_params,
+                            segment_name=segment,
+                            exclude_converted=True
+                        ).to_sql(),
+                        OnTableExistence.KEEP,
+                    ),
+                    Label(segment)
+                ]
+                for segment in self.config.experiment_segments
             ]
-            for segment in self.config.experiment_segments
-        ]
     
     def request_and_plot_metric(
         self,
@@ -104,6 +106,9 @@ class ExperimentAnalyzer:
             exclude_converted: Whether to exclude converted users
         """
         metric = self.metrics.get_metric_by_name(metric_name)
+        
+        # Build segments params if needed
+        self._build_segments_params()
         
         # Use appropriate segments params
         segments_params = self.segments_params_noft if exclude_converted else self.segments_params_all
