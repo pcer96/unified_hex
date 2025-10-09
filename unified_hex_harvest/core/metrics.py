@@ -38,7 +38,7 @@ class MetricDefinitions:
             raise NameError(f"{class_name} not found in global namespace. Make sure to import it in your Hex notebook with: from bsp_data_analysis.helpers import *")
     
     def get_conversion_to_subscription(self) -> Metric:
-        """Get conversion to subscription metric."""
+        """Get conversion to subscription metric - matches original notebook."""
         CustomFirstSuccessRateMetric = self._get_bsp_class('CustomFirstSuccessRateMetric')
         
         return Metric(
@@ -50,7 +50,7 @@ class MetricDefinitions:
         )
     
     def get_conversion_to_pay_subscription(self) -> Metric:
-        """Get conversion to paid subscription metric."""
+        """Get conversion to paid subscription metric - matches original notebook."""
         CustomFirstSuccessRateMetric = self._get_bsp_class('CustomFirstSuccessRateMetric')
         
         return Metric(
@@ -62,7 +62,7 @@ class MetricDefinitions:
         )
     
     def get_subscription_arpu(self) -> Metric:
-        """Get subscription ARPU metric."""
+        """Get subscription ARPU metric - matches original notebook."""
         CustomValuedMetric = self._get_bsp_class('CustomValuedMetric')
         
         return Metric(
@@ -74,7 +74,7 @@ class MetricDefinitions:
         )
     
     def get_subscription_arps(self) -> Metric:
-        """Get subscription ARPS metric."""
+        """Get subscription ARPS metric - matches original notebook."""
         CustomValuedMetric = self._get_bsp_class('CustomValuedMetric')
         
         return Metric(
@@ -86,7 +86,7 @@ class MetricDefinitions:
         )
     
     def get_auto_renew_off(self) -> Metric:
-        """Get auto-renew off metric."""
+        """Get auto-renew off metric - matches original notebook."""
         CustomFirstSuccessRateMetric = self._get_bsp_class('CustomFirstSuccessRateMetric')
         
         return Metric(
@@ -98,7 +98,7 @@ class MetricDefinitions:
         )
     
     def get_qualified_activity_daily(self) -> Metric:
-        """Get qualified activity daily metric."""
+        """Get qualified activity daily metric - matches original notebook."""
         CustomCountMetric = self._get_bsp_class('CustomCountMetric')
         
         return Metric(
@@ -111,7 +111,7 @@ class MetricDefinitions:
         )
     
     def get_sessions(self) -> Metric:
-        """Get sessions metric."""
+        """Get sessions metric - matches original notebook."""
         CustomCountMetric = self._get_bsp_class('CustomCountMetric')
         
         return Metric(
@@ -124,7 +124,7 @@ class MetricDefinitions:
         )
     
     def get_tracked_hours(self) -> Metric:
-        """Get tracked hours metric."""
+        """Get tracked hours metric - matches original notebook."""
         CustomValuedMetric = self._get_bsp_class('CustomValuedMetric')
         
         return Metric(
@@ -137,7 +137,7 @@ class MetricDefinitions:
         )
     
     def get_retention(self) -> Metric:
-        """Get retention metric (placeholder - implement based on your retention logic)."""
+        """Get retention metric - placeholder implementation."""
         # This is a placeholder - you'll need to implement your retention logic
         CustomCountMetric = self._get_bsp_class('CustomCountMetric')
         

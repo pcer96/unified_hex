@@ -162,26 +162,62 @@ class ExperimentAnalyzer:
             segments_params=segments_params,
         )
         
-        # Create plot using matplotlib instead of plotly to avoid compatibility issues
+        # Create beautiful plot using matplotlib
         import matplotlib.pyplot as plt
         import pandas as pd
+        import numpy as np
         
-        plt.figure(figsize=(12, 6))
+        # Set style for beautiful plots
+        plt.style.use('default')
+        plt.rcParams['figure.facecolor'] = 'white'
+        plt.rcParams['axes.facecolor'] = 'white'
+        plt.rcParams['font.size'] = 11
+        plt.rcParams['axes.linewidth'] = 0.8
         
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        fig, ax = plt.subplots(figsize=(14, 8))
         
+        # Beautiful color palette
+        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#7209B7', '#048A81', '#F77F00', '#D62828', '#023047', '#219EBC']
+        
+        # Plot each segment
         for i, segment in enumerate(self.config.experiment_segments):
             if i < len(results):
                 result = results[i]
                 df = pd.DataFrame(result.profile)
-                plt.plot(df['time_bin'], df['value'], 
-                        marker='o', linewidth=2, label=segment, color=colors[i % len(colors)])
+                
+                # Plot line with markers
+                ax.plot(df['time_bin'], df['value'], 
+                       marker='o', linewidth=3, markersize=8, 
+                       label=segment, color=colors[i % len(colors)],
+                       markerfacecolor='white', markeredgewidth=2, markeredgecolor=colors[i % len(colors)],
+                       alpha=0.9)
         
-        plt.title(title.replace('<b>', '').replace('</b>', '').replace('<br>', '\n'), fontsize=14, fontweight='bold')
-        plt.xlabel('Time')
-        plt.ylabel('Value')
-        plt.legend(title='Segment')
-        plt.grid(True, alpha=0.3)
+        # Customize the plot
+        ax.set_title(title.replace('<b>', '').replace('</b>', '').replace('<br>', '\n'), 
+                    fontsize=16, fontweight='bold', pad=20, color='#2C3E50')
+        
+        ax.set_xlabel('Time', fontsize=12, fontweight='bold', color='#34495E')
+        ax.set_ylabel('Value', fontsize=12, fontweight='bold', color='#34495E')
+        
+        # Beautiful legend
+        legend = ax.legend(title='Segment', frameon=True, fancybox=True, shadow=True, 
+                          loc='best', fontsize=11, title_fontsize=12)
+        legend.get_frame().set_facecolor('#F8F9FA')
+        legend.get_frame().set_edgecolor('#DEE2E6')
+        
+        # Grid
+        ax.grid(True, alpha=0.3, linestyle='-', linewidth=0.5, color='#BDC3C7')
+        ax.set_axisbelow(True)
+        
+        # Spines
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#BDC3C7')
+            spine.set_linewidth(0.8)
+        
+        # Format y-axis to show percentages for conversion metrics
+        if 'conversion' in metric_name.lower() or 'c2s' in metric_name.lower() or 'c2p' in metric_name.lower():
+            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.1%}'))
+        
         plt.tight_layout()
         plt.show()
         
@@ -193,6 +229,7 @@ class ExperimentAnalyzer:
         """Plot uplift against a baseline segment."""
         import matplotlib.pyplot as plt
         import pandas as pd
+        import numpy as np
         
         df = pd.DataFrame(results[self.config.experiment_segments.index(uplift_vs)].profile)
         cols = ['time_bin']
@@ -206,21 +243,50 @@ class ExperimentAnalyzer:
                 )
                 cols.append(segment + '_uplift_vs_' + uplift_vs)
         
-        plt.figure(figsize=(12, 6))
+        # Set style for beautiful plots
+        plt.style.use('default')
+        plt.rcParams['figure.facecolor'] = 'white'
+        plt.rcParams['axes.facecolor'] = 'white'
+        plt.rcParams['font.size'] = 11
+        plt.rcParams['axes.linewidth'] = 0.8
         
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+        fig, ax = plt.subplots(figsize=(14, 8))
+        
+        # Beautiful color palette
+        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#7209B7', '#048A81', '#F77F00', '#D62828', '#023047', '#219EBC']
         
         for i, col in enumerate(cols[1:]):  # Skip time_bin column
-            plt.scatter(df['time_bin'], df[col], 
-                       label=col.replace('_uplift_vs_' + uplift_vs, ''), 
-                       color=colors[i % len(colors)], s=50)
+            segment_name = col.replace('_uplift_vs_' + uplift_vs, '')
+            ax.scatter(df['time_bin'], df[col], 
+                      label=segment_name, 
+                      color=colors[i % len(colors)], s=100, alpha=0.8,
+                      edgecolors='white', linewidth=2)
         
-        plt.title(f'Uplift vs {uplift_vs}', fontsize=14, fontweight='bold')
-        plt.xlabel('Days')
-        plt.ylabel('Uplift')
-        plt.legend(title='Segment')
-        plt.grid(True, alpha=0.3)
-        plt.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        ax.set_title(f'Uplift vs {uplift_vs}', fontsize=16, fontweight='bold', pad=20, color='#2C3E50')
+        ax.set_xlabel('Time', fontsize=12, fontweight='bold', color='#34495E')
+        ax.set_ylabel('Uplift', fontsize=12, fontweight='bold', color='#34495E')
+        
+        # Format y-axis as percentage
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.1%}'))
+        
+        # Beautiful legend
+        legend = ax.legend(title='Segment', frameon=True, fancybox=True, shadow=True, 
+                          loc='best', fontsize=11, title_fontsize=12)
+        legend.get_frame().set_facecolor('#F8F9FA')
+        legend.get_frame().set_edgecolor('#DEE2E6')
+        
+        # Grid
+        ax.grid(True, alpha=0.3, linestyle='-', linewidth=0.5, color='#BDC3C7')
+        ax.set_axisbelow(True)
+        
+        # Zero line
+        ax.axhline(y=0, color='#E74C3C', linestyle='-', linewidth=2, alpha=0.7, zorder=0)
+        
+        # Spines
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#BDC3C7')
+            spine.set_linewidth(0.8)
+        
         plt.tight_layout()
         plt.show()
     
