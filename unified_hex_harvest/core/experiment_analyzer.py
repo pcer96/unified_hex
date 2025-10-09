@@ -270,7 +270,7 @@ class ExperimentAnalyzer:
         p.timestamp purchase_timestamp,
         bookings_net_of_platform_fees_usd,
         JSON_EXTRACT_SCALAR(product_info, '$.periodicity') product_periodicity,
-        SAFE_CAST(REGEXP_EXTRACT(JSON_VALUE(product_info, '$.product_description'), r'^\s*(\d+)') AS INT64) seat_number
+        SAFE_CAST(REGEXP_EXTRACT(JSON_VALUE(product_info, '$.product_description'), r'^\\s*(\\d+)') AS INT64) seat_number
       FROM
         `harvest-lumenx-42.verified.bookings` p
       INNER JOIN first_segmentation s ON s.uid = p.user_id
