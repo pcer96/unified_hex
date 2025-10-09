@@ -38,6 +38,21 @@ class ExperimentAnalyzer:
     def _build_common_params(self):
         """Build common parameters when needed."""
         if self.common_params is None:
+            # Dynamically get App, StartDate, etc. from global namespace
+            import sys
+            frame = sys._getframe(2) # Go up 2 levels to get to the caller
+            while frame:
+                if 'App' in frame.f_globals:
+                    App = frame.f_globals['App']
+                    StartDate = frame.f_globals['StartDate']
+                    EndDate = frame.f_globals['EndDate']
+                    ActionsEndDate = frame.f_globals['ActionsEndDate']
+                    GranularityInDays = frame.f_globals['GranularityInDays']
+                    break
+                frame = frame.f_back
+            else:
+                raise NameError("Required bsp_data_analysis.helpers classes (App, StartDate, EndDate, ActionsEndDate, GranularityInDays) not found in global namespace. Make sure to import them in your Hex notebook with: from bsp_data_analysis.helpers import *")
+            
             self.common_params = [
                 App("HarvestWeb"),
                 StartDate(self.config.start_date),
@@ -50,6 +65,19 @@ class ExperimentAnalyzer:
     def _build_segments_params(self):
         """Build segments parameters when needed."""
         if self.segments_params_all is None or self.segments_params_noft is None:
+            # Dynamically get UserBaseBigQuery, OnTableExistence, Label from global namespace
+            import sys
+            frame = sys._getframe(2) # Go up 2 levels to get to the caller
+            while frame:
+                if 'UserBaseBigQuery' in frame.f_globals:
+                    UserBaseBigQuery = frame.f_globals['UserBaseBigQuery']
+                    OnTableExistence = frame.f_globals['OnTableExistence']
+                    Label = frame.f_globals['Label']
+                    break
+                frame = frame.f_back
+            else:
+                raise NameError("Required bsp_data_analysis.helpers classes (UserBaseBigQuery, OnTableExistence, Label) not found in global namespace. Make sure to import them in your Hex notebook with: from bsp_data_analysis.helpers import *")
+            
             custom_user_base_common_params = {
                 "experiment_name": self.config.experiment_name,
                 "start_date": self.config.start_date,
@@ -116,6 +144,18 @@ class ExperimentAnalyzer:
         # Build default title
         default_title = f"<b>{metric.name}</b><br>StartDate={self.config.start_date} EndDate={self.config.end_date} ActionsEndDate={self.config.actions_end_date}"
         title = default_title if title is None else title
+        
+        # Dynamically get request_multiple_metrics, plot_profiles from global namespace
+        import sys
+        frame = sys._getframe(1) # Go up 1 level to get to the caller
+        while frame:
+            if 'request_multiple_metrics' in frame.f_globals:
+                request_multiple_metrics = frame.f_globals['request_multiple_metrics']
+                plot_profiles = frame.f_globals['plot_profiles']
+                break
+            frame = frame.f_back
+        else:
+            raise NameError("Required bsp_data_analysis.helpers functions (request_multiple_metrics, plot_profiles) not found in global namespace. Make sure to import them in your Hex notebook with: from bsp_data_analysis.helpers import *")
         
         # Request metrics
         results = request_multiple_metrics(
